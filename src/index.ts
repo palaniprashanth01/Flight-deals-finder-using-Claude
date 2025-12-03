@@ -7,6 +7,7 @@ import {
 import dotenv from 'dotenv';
 import { AmadeusClient } from './amadeus-client.js';
 import { SerpApiClient } from './serpapi-client.js';
+import { RazorpayClient } from './razorpay-client.js';
 import { SearchParams } from './types.js';
 
 dotenv.config();
@@ -22,6 +23,8 @@ const amadeusClient = (AMADEUS_CLIENT_ID && AMADEUS_CLIENT_SECRET)
 const serpApiClient = SERPAPI_API_KEY
     ? new SerpApiClient(SERPAPI_API_KEY)
     : null;
+
+const razorpayClient = new RazorpayClient();
 
 const server = new Server(
     {
@@ -93,6 +96,36 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                     required: ["origin", "destination"],
                 },
             },
+            {
+                name: "create_payment_link",
+                description: "Create a payment link for a flight booking. Default user details: Name: Palani Prashanth B, Email: palaniprashanth2001@gmail.com, Contact: 7397571872. MANDATORY PREREQUISITE: You MUST have already called `get_seat_map` and shown the seats to the user. Do NOT call this tool if you haven't shown the seat map. Also, ask 'Do you want to use your default details?' BEFORE calling this tool.",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        amount: { type: "number", description: "Amount in major currency unit (e.g., 100 for 100 INR)" },
+                        currency: { type: "string", description: "Currency code (e.g., INR)" },
+                        description: { type: "string", description: "Description of the payment" },
+                        name: { type: "string", description: "Customer name (Default: Palani Prashanth B)" },
+                        email: { type: "string", description: "Customer email (Default: palaniprashanth2001@gmail.com)" },
+                        contact: { type: "string", description: "Customer contact number (Default: 7397571872)" },
+                    },
+                    required: ["amount", "currency", "description", "name", "email", "contact"],
+                },
+            },
+            {
+                name: "get_seat_map",
+                description: "MANDATORY: Call this tool to retrieve and display the actual seat map. Do NOT ask for generic preferences (window/aisle) without showing the map first. IMPORTANT: If this tool returns 'Seat map not available', tell the user exactly that. Do NOT make up seat numbers (like 12A, 12B) if you don't see them in the tool output.",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        flightOffer: {
+                            type: "string",
+                            description: "The full flight offer object as a JSON string (returned from search_flights)",
+                        },
+                    },
+                    required: ["flightOffer"],
+                },
+            },
         ],
     };
 });
@@ -158,6 +191,45 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     }, null, 2)
                 }],
             };
+        }
+
+
+
+        case "create_payment_link": {
+            const { amount, currency, description, name, email, contact } = request.params.arguments as any;
+            try {
+                const paymentLink = await razorpayClient.createPaymentLink(amount, currency, description, { name, email, contact });
+                return {
+                    content: [{ type: "text", text: JSON.stringify(paymentLink, null, 2) }],
+                };
+            } catch (error: any) {
+                return {
+                    content: [{ type: "text", text: `Error creating payment link: ${error.message}` }],
+                    isError: true,
+                };
+            }
+        }
+
+        case "get_seat_map": {
+            const { flightOffer } = request.params.arguments as any;
+            try {
+                const offerObj = JSON.parse(flightOffer);
+                if (!amadeusClient) {
+                    return {
+                        content: [{ type: "text", text: "Amadeus client not initialized." }],
+                        isError: true,
+                    };
+                }
+                const seatMap = await amadeusClient.getSeatMap(offerObj);
+                return {
+                    content: [{ type: "text", text: JSON.stringify(seatMap, null, 2) }],
+                };
+            } catch (error: any) {
+                return {
+                    content: [{ type: "text", text: `SYSTEM_ALERT: SEAT_MAP_UNAVAILABLE. STOP. DO NOT GENERATE A LIST OF SEATS. YOU MUST TELL THE USER: "Real-time seat map is not available for this flight." (Error: ${error.message}). Ask the user for their preference (Window/Aisle) instead.` }],
+                    isError: true,
+                };
+            }
         }
 
         default:

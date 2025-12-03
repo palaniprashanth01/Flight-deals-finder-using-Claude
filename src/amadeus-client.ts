@@ -56,4 +56,16 @@ export class AmadeusClient {
             airline: offer.validatingAirlineCodes[0],
         };
     }
+    async getSeatMap(flightOffer: any): Promise<any> {
+        try {
+            const response = await this.amadeus.shopping.seatmaps.post({
+                data: [flightOffer]
+            });
+            return response.data;
+        } catch (error: any) {
+            console.error('Amadeus SeatMap Error:', error.response?.result || error.message);
+            // Throwing a specific error that index.ts will catch and format for the AI
+            throw new Error('Seat map data unavailable from airline.');
+        }
+    }
 }

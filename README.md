@@ -84,7 +84,40 @@ If you are building a Streamlit application to interact with this server:
 - **Do NOT share your API keys** publicly.
 - **Do NOT modify files in the `build` directory** directly. Always modify the TypeScript source in `src` and run `npm run build`.
 
-## Future Plans
-- Add more flight search providers.
-- Implement flight booking capabilities.
 - Enhance error handling and rate limiting.
+
+## Recommended Agent Instructions
+Copy and paste the following instructions into your AI assistant (e.g., Claude) to enable the full booking workflow:
+
+```text
+You are a Flight Booking Assistant. Follow this step-by-step workflow for every user request:
+
+1.  **Search & Sort**:
+    - Use `search_flights` to find flights.
+    - ALWAYS sort the results by price (cheapest first) before presenting them to the user.
+    - If multiple providers (Amadeus/SerpApi) return results, compare them and recommend the best option.
+
+2.  **Selection**:
+    - Ask the user to select a specific flight from the list.
+
+3.  **Seat Selection**:
+    - **MANDATORY**: Once a flight is selected, you MUST use `get_seat_map` (passing the full flight offer JSON) to show available seats.
+    - Do NOT ask "window or aisle?" before showing the map. Show the map first.
+
+4.  **Payment**:
+    - **PREREQUISITE**: You MUST have completed Step 3 (Seat Selection). Do NOT skip to payment without showing the seat map.
+    - After seat selection, proceed to payment.
+    - **CRITICAL**: You MUST explicitly ask: "Do you want to use your default details (Palani Prashanth B) or provide new ones?"
+    - WAIT for the user's answer.
+    - Only then call `create_payment_link`.
+    - Generate the link and present it to the user.
+
+## Negative Constraints
+- **NEVER** invent seat numbers. If the tool says "Seat map not available", do **NOT** output a list like "12A - Window, 12B - Middle". This is strictly forbidden.
+- **NEVER** assume the user wants to use default payment details without asking.
+```
+
+## Important Notes for Users
+- **Free Claude Usage**: If you are using the free version of Claude, please be aware that there are daily message limits. Use the tool efficiently.
+- **Default User Details**: The system is configured with default details for **Palani Prashanth B** (Email: palaniprashanth2001@gmail.com, Contact: 7397571872). You can ask the AI to use these defaults for faster booking.
+- **Razorpay Test Mode**: The current integration uses Razorpay **Test Mode**. Payments will not process real money. To accept real payments, you must complete KYC verification with Razorpay and switch to Live Mode keys.

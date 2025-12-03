@@ -21,6 +21,7 @@
         "@modelcontextprotocol/sdk": "^1.0.1",
         "amadeus": "^11.0.0",
         "dotenv": "^16.4.5",
+        "razorpay": "^2.9.6",
         "serpapi": "^2.2.1"
     },
     "devDependencies": {

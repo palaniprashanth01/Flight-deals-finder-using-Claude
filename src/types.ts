@@ -32,3 +32,12 @@ export interface SearchParams {
     currency?: string;
     maxPrice?: number;
 }
+
+export interface PaymentLinkParams {
+    amount: number;
+    currency: string;
+    description: string;
+    name: string;
+    email: string;
+    contact: string;
+}
