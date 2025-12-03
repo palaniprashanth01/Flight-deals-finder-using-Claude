@@ -1,0 +1,30 @@
+{
+    "name": "flight-deals-finder-mcp",
+    "version": "1.0.0",
+    "type": "module",
+    "description": "MCP server for finding flight deals using Amadeus API",
+    "main": "build/index.js",
+    "scripts": {
+        "build": "tsc",
+        "start": "node build/index.js",
+        "dev": "tsc && node build/index.js"
+    },
+    "keywords": [
+        "mcp",
+        "amadeus",
+        "flight",
+        "deals"
+    ],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.0.1",
+        "amadeus": "^11.0.0",
+        "dotenv": "^16.4.5",
+        "serpapi": "^2.2.1"
+    },
+    "devDependencies": {
+        "@types/node": "^20.11.24",
+        "typescript": "^5.3.3"
+    }
+}

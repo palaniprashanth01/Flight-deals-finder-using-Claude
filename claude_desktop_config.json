@@ -1,0 +1,15 @@
+{
+    "mcpServers": {
+        "flight-deals-finder": {
+            "command": "node",
+            "args": [
+                "/Users/palaniprashanth/.gemini/antigravity/playground/kinetic-rosette/build/index.js"
+            ],
+            "env": {
+                "AMADEUS_CLIENT_ID": "30nw6mmet5tMxB4Vfpajw5Pvz9l6zD0m",
+                "AMADEUS_CLIENT_SECRET": "WeSfDNvcYBrSLcdH",
+                "SERPAPI_API_KEY": "37983b13e4e3dca16cac63531b12ffb36e95473c9f220f1f430b13e5d8e3b8e7"
+            }
+        }
+    }
+}
