@@ -43,7 +43,12 @@ npm start
 ```
 
 ### Using with Claude Desktop
-To use this server with Claude Desktop, add the following configuration to your `claude_desktop_config.json`:
+To use this server with Claude Desktop, follow these steps:
+
+1.  Open Claude Desktop.
+2.  Go to **Settings** -> **Developer**.
+3.  Click on **Edit Config**. This will open the `claude_desktop_config.json` file in your default text editor.
+4.  Paste the following configuration into the file:
 
 ```json
 {
@@ -62,7 +67,11 @@ To use this server with Claude Desktop, add the following configuration to your 
   }
 }
 ```
-*Note: Replace `/absolute/path/to/` with the actual path to your project directory.*
+*Note: Replace `/absolute/path/to/` with the actual absolute path to your project directory.*
+
+5.  Save the file.
+6.  **Restart Claude Desktop fully** (quit the application and open it again).
+7.  Start asking questions in Claude!
 
 ### Integration with Streamlit
 If you are building a Streamlit application to interact with this server:
